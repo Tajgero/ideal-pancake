@@ -195,11 +195,12 @@ def minimax(board: list[list, list, list]) -> tuple:
     # In this place, returning value must have some optimal moves and best
     # possible outcome of a game
     elif player(board) == X: # MAX player
-        best_value, best_action = maxValue(board)
         
         # 2a. If in next AI will win, then return that action
         if action := fast_win(board, player=O):
             return action
+        
+        best_value, best_action = maxValue(board)
         
     elif player(board) == O: # MIN player
         
@@ -211,7 +212,6 @@ def minimax(board: list[list, list, list]) -> tuple:
     
     return best_action
         
-    # TODO -> A,B Pruning
     
 def minValue(board) -> tuple:
     """
@@ -233,6 +233,10 @@ def minValue(board) -> tuple:
         if v_new < v:
             v = v_new
             best_move = action
+
+            # After finding best move if there is really minimized play involved, return immediately
+            if v_new == -1: # AB Pruning not needed when only 3 results
+                return v_new, best_move
 
     return v_new, best_move
 
@@ -257,6 +261,9 @@ def maxValue(board) -> tuple:
         if v_new > v:
             v = v_new
             best_move = action
-  
+            
+            # After finding best move if there is really maximized play involved, return immediately
+            if v_new == 1: # AB Pruning not needed when only 3 results
+                return v_new, best_move
+        
     return v_new, best_move
-
