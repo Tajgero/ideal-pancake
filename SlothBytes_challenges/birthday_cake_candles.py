@@ -32,14 +32,16 @@ class Candles():
         elif next_candle > this_candle:
             this_candle = next_candle
             
-        elif next_candle == this_candle:
+        else:
             return 1 + n, this_candle
            
             
         return n, this_candle
         
-
-Candles([4,4,1,3])
-Candles([4,4,1,3])
-Candles([1, 1, 1, 1])
-Candles([])
+    
+if __name__ == '__main__':
+    
+    Candles([4,4,1,3])
+    Candles([4,4,1,3])
+    Candles([1, 1, 1, 1])
+    Candles([])
