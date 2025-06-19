@@ -1,5 +1,13 @@
 from logic import *
 
+"""
+* Gilderoy, Minerva, Pomona and Horace each belong to a different one of the four houses:
+  Gryffindor, Hufflepuff, Ravenclaw, and Slytherin House.
+* Gilderoy belongs to Gryffindor or Ravenclaw.
+* Pomona does not belong in Slytherin.
+* Minerva belongs to Gryffindor.
+"""
+
 people = ["Gilderoy", "Pomona", "Minerva", "Horace"]
 houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
 

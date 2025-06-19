@@ -10,5 +10,4 @@ knowledge = And(
     Not(And(hagrid, dumbledore)),
     dumbledore
 )
-
 print(model_check(knowledge, rain))
