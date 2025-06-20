@@ -89,45 +89,62 @@ class Sentence():
     Logical statement about a Minesweeper game
     A sentence consists of a set of board cells,
     and a count of the number of those cells which are mines.
+    
+    Sentence only consider cells which are with unknown bomb/safe status
+    
+    sentence = tuple(set{str}, count: int)
+    self.cells = set(tuple, tuple ...)
+    self.count = int
+    
+    sentence_0 = Sentence(((1,5), (2,6), ...), 2)
     """
 
     def __init__(self, cells, count):
         self.cells = set(cells)
         self.count = count
 
-    def __eq__(self, other):
+    def __eq__(self, other): # Same sentence <-> True
         return self.cells == other.cells and self.count == other.count
 
     def __str__(self):
         return f"{self.cells} = {self.count}"
 
-    def known_mines(self):
+    def known_mines(self) -> set:
         """
         Returns the set of all cells in self.cells known to be mines.
+        If count equals number of cells then all of the are mines.
         """
-        raise NotImplementedError
-
-    def known_safes(self):
+        return {cell for cell in self.cells} if len(self.cells) == self.count else set()
+        
+    def known_safes(self) -> set:
         """
         Returns the set of all cells in self.cells known to be safe.
+        If count equals 0 then all cells are safe
         """
-        raise NotImplementedError
+        return {cell for cell in self.cells} if self.count == 0 else set()
 
     def mark_mine(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be a mine.
         """
-        raise NotImplementedError
+        # If cell is one of the cells included in the sentence
+        if cell in self.known_mines():
+            # Function updates the sentence so that cell is no longer in the sentence,
+            # but still is logically correct given that cell is known to be a mine.
+            self.cells.remove(cell)
+
+        # No action needed otherwise
 
     def mark_safe(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be safe.
+        Same as mark_mine but with safe cells
         """
-        raise NotImplementedError
-
-
+        if cell in self.known_safes():
+            self.cells.remove(cell)
+            
 class MinesweeperAI():
     """
     Minesweeper game player
@@ -135,7 +152,7 @@ class MinesweeperAI():
 
     def __init__(self, height=8, width=8):
 
-        # Set initial height and width
+        # Set initial height and width of a board
         self.height = height
         self.width = width
 
@@ -153,6 +170,8 @@ class MinesweeperAI():
         """
         Marks a cell as a mine, and updates all knowledge
         to mark that cell as a mine as well.
+        In sentence this mine cell is discarded, but will be in
+        self.mines inside AI class
         """
         self.mines.add(cell)
         for sentence in self.knowledge:
@@ -162,6 +181,8 @@ class MinesweeperAI():
         """
         Marks a cell as safe, and updates all knowledge
         to mark that cell as safe as well.
+        In sentence this safe cell is discarded, but will be in
+        self.mines inside AI class
         """
         self.safes.add(cell)
         for sentence in self.knowledge:
@@ -182,9 +203,9 @@ class MinesweeperAI():
             5) add any new sentences to the AI's knowledge base
                if they can be inferred from existing knowledge
         """
-        # raise NotImplementedError
+        raise NotImplementedError
 
-    def make_safe_move(self):
+    def make_safe_move(self) -> tuple[int][int] or None:
         """
         Returns a safe cell to choose on the Minesweeper board.
         The move must be known to be safe, and not already a move
@@ -193,13 +214,34 @@ class MinesweeperAI():
         This function may use the knowledge in self.mines, self.safes
         and self.moves_made, but should not modify any of those values.
         """
-        raise NotImplementedError
+        for move in self.safes:
+            if move not in self.moves_made:
+                i, j = move
+                return (i, j)
+            
+        return None
+        
 
-    def make_random_move(self):
+    def make_random_move(self) -> tuple[int][int] or None:
         """
-        Returns a move to make on the Minesweeper board.
+        Returns a move to make on the Minesweeper board
+        if safe move is not possible.
+        
         Should choose randomly among cells that:
             1) have not already been chosen, and
             2) are not known to be mines
         """
-        raise NotImplementedError
+        if self.make_safe_move() == None:
+            # Makes list(tuples) of possible moves for now
+            possible_moves = tuple((i, j) for i in range(self.height) for j in range(self.width))
+            
+            # Modifies possible moves based on: mines and moves_made cells
+            for cell in (self.mines | self.moves_made):
+                possible_moves.remove(cell)
+
+            # Pick random move from possible moves
+            return random.choice(possible_moves)
+            
+            
+        
+        return None

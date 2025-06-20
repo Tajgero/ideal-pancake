@@ -11,6 +11,7 @@ MINES = 8
 # Colors
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
+DARK_GRAY = (97, 97, 97)
 WHITE = (255, 255, 255)
 
 # Create game
@@ -24,6 +25,11 @@ resizer = height / 400
 smallFont = pygame.font.Font(OPEN_SANS, int(20 * resizer))
 mediumFont = pygame.font.Font(OPEN_SANS, int(28 * resizer))
 largeFont = pygame.font.Font(OPEN_SANS, int(40 * resizer))
+
+# Sounds
+enable_boom_sound = True
+mine_sound = pygame.mixer.Sound("assets/audio/boom.mp3")
+mine_sound.set_volume(0.05) # x*100 % volume
 
 # Compute board size
 BOARD_PADDING = 20
@@ -46,6 +52,7 @@ ai = MinesweeperAI(height=HEIGHT, width=WIDTH)
 revealed = set()
 flags = set()
 lost = False
+clicked_matrix = [[False for height in range(WIDTH)] for width in range(HEIGHT)]
 
 # Show instructions initially
 instructions = True
@@ -112,15 +119,18 @@ while True:
                 board_origin[1] + i * cell_size,
                 cell_size, cell_size
             )
-            pygame.draw.rect(screen, GRAY, rect)
-            pygame.draw.rect(screen, WHITE, rect, 3)
+            pygame.draw.rect(screen, DARK_GRAY if clicked_matrix[i][j] else GRAY, rect)
+            pygame.draw.rect(screen, WHITE, rect, width=3)
 
             # Add a mine, flag, or number if needed
             if game.is_mine((i, j)) and lost:
                 screen.blit(mine, rect)
+                mine_sound.play() if enable_boom_sound else None
+                enable_boom_sound = False
             elif (i, j) in flags:
                 screen.blit(flag, rect)
             elif (i, j) in revealed:
+                clicked_matrix[i][j] = True
                 neighbors = smallFont.render(
                     str(game.nearby_mines((i, j))),
                     True, BLACK
@@ -201,6 +211,8 @@ while True:
             revealed = set()
             flags = set()
             lost = False
+            enable_boom_sound = True
+            clicked_matrix = [[False for height in range(WIDTH)] for width in range(HEIGHT)]
             continue
 
         # User-made move
