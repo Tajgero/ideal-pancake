@@ -108,7 +108,7 @@ class Sentence():
     def __str__(self):
         return f"{self.cells} = {self.count}"
 
-    def known_mines(self) -> set:
+    def known_mines(self):
         """
         Returns the set of all cells in self.cells known to be mines.
         If count equals number of cells then all of the are mines.
@@ -257,7 +257,7 @@ class MinesweeperAI():
                     Sentence(new_cells, new_count)
                 )
 
-    def make_safe_move(self) -> tuple[int][int] or None:
+    def make_safe_move(self):
         """
         Returns a safe cell to choose on the Minesweeper board.
         The move must be known to be safe, and not already a move
@@ -272,7 +272,7 @@ class MinesweeperAI():
             
         return None
         
-    def make_random_move(self) -> tuple[int][int] or None:
+    def make_random_move(self):
         """
         Returns a move to make on the Minesweeper board
         if safe move is not possible.
