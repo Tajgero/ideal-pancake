@@ -128,8 +128,7 @@ while True:
             if show_indexes:
                 currentCellText = smallerFont.render(f"({i},{j})", True, BLACK)
                 currentCellRect = currentCellText.get_rect()
-                currentCellRect.center = rect.center
-                currentCellRect.centery += 27
+                currentCellRect.midbottom = rect.midbottom
                 screen.blit(currentCellText, currentCellRect)
 
             # Add a mine, flag, or number if needed
