@@ -246,8 +246,11 @@ class MinesweeperAI():
 
 
         # 5) Inference by checking subsets of all sentences to
-        #    create new sentences for knowledge (I think self.knowledge)
-        if len(self.knowledge) > 1:
+        #    create new sentences for knowledge and do as much as
+        #    it is still possible to conclude more inferences
+        check_inference = True
+        MAX_INFERENCE = 5
+        while check_inference and len(knowledge) > 1 and MAX_INFERENCE: # TODO: Repair check_inference
             for sentence_1, sentence_2 in combinations(knowledge, 2):
 
                 check_inference = False
@@ -256,13 +259,13 @@ class MinesweeperAI():
                     continue
 
                 # If new sentence is a subset of sentences in knowledge
-                elif sentence_1.cells <= sentence_2.cells:
+                elif sentence_1.cells < sentence_2.cells:
                     new_cells = sentence_2.cells - sentence_1.cells
                     new_count = sentence_2.count - sentence_1.count
                     check_inference = True
 
                 # If knowledge sentence is a subset of a new sentence
-                elif sentence_2.cells <= sentence_1.cells:
+                elif sentence_2.cells < sentence_1.cells:
                     new_cells = sentence_1.cells - sentence_2.cells
                     new_count = sentence_1.count - sentence_2.count
                     check_inference = True
@@ -272,15 +275,19 @@ class MinesweeperAI():
 
                     new_infer_sentence = Sentence(new_cells, new_count)
 
-                    # If sentence already in knowledge skip it
+                    # If sentence already in knowledge skip it and remove duplicate in list
                     if any(new_infer_sentence == sentence for sentence in self.knowledge):
+                        self.knowledge.remove(new_infer_sentence)
                         continue
 
                     # Append to knowledge
                     self.knowledge.append(new_infer_sentence)
 
-                    # Updates mines, safes and blank senteces in AI
+                    # Updates mines, safes and blank senteces on new sentence in AI
                     self.check_known_cells(new_infer_sentence)
+                MAX_INFERENCE -= 1
+            if MAX_INFERENCE < 0:
+                break
 
         # END OF INFERENCE
 
