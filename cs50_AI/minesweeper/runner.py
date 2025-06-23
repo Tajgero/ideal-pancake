@@ -22,6 +22,7 @@ screen = pygame.display.set_mode(size)
 # Fonts
 OPEN_SANS = "assets/fonts/OpenSans-Regular.ttf"
 resizer = height / 400
+smallerFont = pygame.font.Font(OPEN_SANS, int(8 * resizer))
 smallFont = pygame.font.Font(OPEN_SANS, int(20 * resizer))
 mediumFont = pygame.font.Font(OPEN_SANS, int(28 * resizer))
 largeFont = pygame.font.Font(OPEN_SANS, int(40 * resizer))
@@ -56,6 +57,7 @@ clicked_matrix = [[False for height in range(WIDTH)] for width in range(HEIGHT)]
 
 # Show instructions initially
 instructions = True
+show_indexes = False
 
 while True:
 
@@ -122,6 +124,14 @@ while True:
             pygame.draw.rect(screen, DARK_GRAY if clicked_matrix[i][j] else GRAY, rect)
             pygame.draw.rect(screen, WHITE, rect, width=3)
 
+            # Shows indexes on board
+            if show_indexes:
+                currentCellText = smallerFont.render(f"({i},{j})", True, BLACK)
+                currentCellRect = currentCellText.get_rect()
+                currentCellRect.center = rect.center
+                currentCellRect.centery += 27
+                screen.blit(currentCellText, currentCellRect)
+
             # Add a mine, flag, or number if needed
             if game.is_mine((i, j)) and lost:
                 screen.blit(mine, rect)
@@ -138,7 +148,7 @@ while True:
                 neighborsTextRect = neighbors.get_rect()
                 neighborsTextRect.center = rect.center
                 screen.blit(neighbors, neighborsTextRect)
-
+                
             row.append(rect)
         cells.append(row)
 
@@ -162,6 +172,17 @@ while True:
     buttonRect = buttonText.get_rect()
     buttonRect.center = resetButton.center
     pygame.draw.rect(screen, WHITE, resetButton)
+    screen.blit(buttonText, buttonRect)
+
+    # Show cells index button
+    cellsIndexButton = pygame.Rect(
+        (2 / 3) * width + BOARD_PADDING, BOARD_PADDING,
+        (width / 3) - BOARD_PADDING * 2, 35 * resizer
+    )
+    buttonText = smallFont.render("Show cell index", True, BLACK)
+    buttonRect = buttonText.get_rect()
+    buttonRect.center = cellsIndexButton.center
+    pygame.draw.rect(screen, WHITE, cellsIndexButton)
     screen.blit(buttonText, buttonRect)
 
     # Display text
@@ -214,6 +235,11 @@ while True:
             enable_boom_sound = True
             clicked_matrix = [[False for height in range(WIDTH)] for width in range(HEIGHT)]
             continue
+
+        # Prints cell indexes
+        elif cellsIndexButton.collidepoint(mouse):
+            show_indexes = not show_indexes
+            time.sleep(0.2)
 
         # User-made move
         elif not lost:
