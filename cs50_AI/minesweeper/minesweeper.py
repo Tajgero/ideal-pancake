@@ -1,3 +1,4 @@
+from itertools import combinations
 import random
 
 class Minesweeper():
@@ -91,12 +92,14 @@ class Sentence():
     sentence = tuple(set{str}, count: int)
     self.cells = set(tuple, tuple ...)
     self.count = int
+    self.move = tuple()
     
     sentence_0 = Sentence({(1,5), (2,6), ...}, 2)
     """
     def __init__(self, cells, count):
         self.cells = set(cells)
         self.count = count
+        self.move = tuple() # DEBUGGING PURPOSES
 
     def __eq__(self, other): # Same sentence <-> True
         return self.cells == other.cells and self.count == other.count
@@ -227,6 +230,7 @@ class MinesweeperAI():
         
         # NEWLY CREATED SENTENCE FOR FUTURE USE
         new_sentence = Sentence(neighbors_to_check, count)
+        new_sentence.move = cell # DEBUGGING PURPOSES
         self.knowledge.append(new_sentence)
         
         
@@ -236,57 +240,77 @@ class MinesweeperAI():
         knowledge = self.knowledge.copy()
         for sentence in knowledge:
             
-            # First make sure to delete all blank sentences in knowledge
-            if sentence.cells == set():
-                self.knowledge.remove(sentence)
-                continue
-            
-            # Conclude safe cells
-            if sentence.known_safes():
-                cells = [cell for cell in sentence.known_safes()]
-                for cell in cells:
-                    self.mark_safe(cell)
-
-            # Conclude mine cells
-            if sentence.known_mines():
-                cells = [cell for cell in sentence.known_mines()]
-                for cell in cells:
-                    self.mark_mine(cell)
+            # Updates mines, safes and blank senteces in AI
+            self.check_known_cells(sentence)
 
                 
-        # 5) Inference by checking subsets of newly created sentence to
+        # 5) Inference by checking subsets of all sentences to
         #    create new sentences for knowledge (I think self.knowledge)
         if len(self.knowledge) > 1:
-            
-            for sentence in knowledge:
+            for sentence_1, sentence_2 in combinations(knowledge, 2):
+               
+                check_inference = False
                 
-                sentence_1, sentence_2 = new_sentence, sentence
                 if sentence_1 == sentence_2:
-                    continue
+                    continue                
                 
-                # If I find subset in pair of sentences
-                # then I can inference some new logic
-                # New sentence with cells and different count
-                if sentence_1.cells <= sentence_2.cells:
+                # If new sentence is a subset of sentences in knowledge
+                elif sentence_1.cells <= sentence_2.cells:
                     new_cells = sentence_2.cells - sentence_1.cells
                     new_count = sentence_2.count - sentence_1.count
-                    new_sentence = Sentence(new_cells, new_count)
+                    check_inference = True
+                    
+                # If knowledge sentence is a subset of a new sentence
+                elif sentence_2.cells <= sentence_1.cells:
+                    new_cells = sentence_1.cells - sentence_2.cells
+                    new_count = sentence_1.count - sentence_2.count
+                    check_inference = True
+
+                # When new inference is created
+                if check_inference:    
+                    
+                    new_infer_sentence = Sentence(new_cells, new_count)
                     
                     # If sentence already in knowledge skip it
-                    if any(new_sentence == sentence for sentence in self.knowledge):
+                    if any(new_infer_sentence == sentence for sentence in self.knowledge):
                         continue
                     
-                    self.knowledge.append(
-                        Sentence(new_cells, new_count)
-                    )
-        
-        
+                    # Updates mines, safes and blank senteces in AI
+                    self.check_known_cells(new_infer_sentence)
+                    
+                    # Append to knowledge
+                    self.knowledge.append(new_infer_sentence)
+                
+        # END OF INFERENCE    
+                
         # Shows what is going on in knowledge base, safe and mine cells
-        for i, sentence in enumerate(self.knowledge):
-            print(f"Se_{i}: {sentence}")
+        for sentence in self.knowledge: # DEBUGGING PURPOSES
+            print(f"Sentence {sentence.move}: {sentence}")
+        print()
         print(f"Safe: {self.safes}")        
         print(f"Mine: {self.mines}")        
-        print("\n")
+        print(f"\n{10*'='}")
+        
+    def check_known_cells(self, sentence):
+        """
+        Checks for known safes, known mines in sentence provided
+        and marks in AI these findings. It also removes blank sentences
+        """
+        # Conclude safe cells
+        if sentence.known_safes():
+            cells = [cell for cell in sentence.known_safes()]
+            for cell in cells:
+                self.mark_safe(cell)
+
+        # Conclude mine cells
+        if sentence.known_mines():
+            cells = [cell for cell in sentence.known_mines()]
+            for cell in cells:
+                self.mark_mine(cell)
+
+        # Make sure to delete all blank sentences in knowledge
+        if sentence.cells == set():
+            self.knowledge.remove(sentence)
         
     def make_safe_move(self):
         """
