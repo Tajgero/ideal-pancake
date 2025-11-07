@@ -1,0 +1,34 @@
+
+Sumy cyfr o d³ugoœciach: 1, które s¹ liczbami pierwszymi:
+Kombinacja: (2,), Suma: 2
+Kombinacja: (3,), Suma: 3
+Kombinacja: (5,), Suma: 5
+
+Sumy cyfr o d³ugoœciach: 2, które s¹ liczbami pierwszymi:
+Kombinacja: (1, 2), Suma: 3
+Kombinacja: (1, 4), Suma: 5
+Kombinacja: (1, 6), Suma: 7
+Kombinacja: (2, 3), Suma: 5
+Kombinacja: (2, 5), Suma: 7
+Kombinacja: (3, 4), Suma: 7
+Kombinacja: (5, 6), Suma: 11
+
+Sumy cyfr o d³ugoœciach: 3, które s¹ liczbami pierwszymi:
+Kombinacja: (1, 2, 4), Suma: 7
+Kombinacja: (1, 4, 6), Suma: 11
+Kombinacja: (2, 3, 6), Suma: 11
+Kombinacja: (2, 4, 5), Suma: 11
+Kombinacja: (2, 5, 6), Suma: 13
+Kombinacja: (3, 4, 6), Suma: 13
+
+Sumy cyfr o d³ugoœciach: 4, które s¹ liczbami pierwszymi:
+Kombinacja: (1, 2, 3, 5), Suma: 11
+Kombinacja: (1, 2, 4, 6), Suma: 13
+Kombinacja: (1, 3, 4, 5), Suma: 13
+Kombinacja: (2, 4, 5, 6), Suma: 17
+
+Sumy cyfr o d³ugoœciach: 5, które s¹ liczbami pierwszymi:
+Kombinacja: (1, 2, 3, 5, 6), Suma: 17
+Kombinacja: (1, 3, 4, 5, 6), Suma: 19
+
+Sumy cyfr o d³ugoœciach: 6, które s¹ liczbami pierwszymi:
