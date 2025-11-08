@@ -12,9 +12,9 @@ def compute_model_output(X, w, b):
     return f_wb
 
 
-def compute_cost(X, y, w, b):
+def compute_cost(X, y, w, b, reg=0):
     """Computes cost for linear regression"""
-    m = X.shape[0] # number of training examples
+    m, n = X.shape # number of training examples and features
     
     cost_sum = 0
     for i in range(m):
@@ -22,11 +22,15 @@ def compute_cost(X, y, w, b):
         cost = (f_wb - y[i]) ** 2
         cost_sum += cost
     total_cost = (1 / (2 * m)) * cost_sum
+    
+    if reg: # Changes cost for regularization
+        total_cost += reg * np.sum(w ** 2)
+        total_cost /= (2 * m)
 
     return total_cost
 
 
-def compute_parameters(X, y, w, b, a=0.001):
+def compute_parameters(X, y, w, b, a=0.001, reg=0):
     """Computes parameters inside for linear regression"""
     m, n = X.shape # m - parameters, n - features
     
@@ -51,7 +55,8 @@ def compute_parameters(X, y, w, b, a=0.001):
             
         return dj_db / m
     
-    new_w = w - a * der_sum_weight()
+    # Added regularization at the end
+    new_w = w - a * der_sum_weight() - a * (reg * w) / m
     new_b = b - a * der_sum_bias()
     
     return (new_w, new_b)
@@ -71,6 +76,8 @@ if __name__ == "__main__":
     # Starting point
     w = np.zeros(X.shape[1]) # Number of features
     b = 0
+    a = 5e-7
+    regularization = 0
     error = np.inf
     
     # History
@@ -78,8 +85,8 @@ if __name__ == "__main__":
     
     # Finding weight and bias
     for i in range(MAX_ITERATIONS):
-        w, b = compute_parameters(X, y, w, b, a=5e-7)
-        new_error = compute_cost(X, y, w, b)
+        w, b = compute_parameters(X, y, w, b, a, regularization)
+        new_error = compute_cost(X, y, w, b, regularization)
         
         # Save cost J at each iteration
         if i % 10 == 0: # prevent resource exhaustion 

@@ -22,7 +22,7 @@ def compute_model_output(X, w, b):
     return f_wb
 
 
-def compute_cost_log(X, y, w, b):
+def compute_cost_log(X, y, w, b, reg=0):
     """Cost function for logistic regression"""
     m = X.shape[0]
 
@@ -31,8 +31,13 @@ def compute_cost_log(X, y, w, b):
         f_wb = sigmoid(np.dot(w, X[i]) + b)
         cost = loss_log(y[i], f_wb)
         cost_sum += cost
+    cost_sum /= m
 
-    return cost_sum / m
+    if reg: # Changes cost for regularization
+        cost_sum += reg * np.sum(w ** 2)
+        cost_sum /= (2 * m)
+
+    return cost_sum
 
 
 def compute_gradient_log(X, y, w, b):
@@ -57,7 +62,9 @@ def compute_gradient_log(X, y, w, b):
     return (dj_dw / m, dj_db / m)
 
 
-def gradient_descent_log(X, y, w_in, b_in, alpha=0.01, num_iters=10000, erg_eval=1e-3):
+def gradient_descent_log(
+    X, y, w_in, b_in, alpha=0.01, num_iters=10000, erg_eval=1e-3, reg=0
+):
     """
     Performs batch gradient descent
     
@@ -69,6 +76,7 @@ def gradient_descent_log(X, y, w_in, b_in, alpha=0.01, num_iters=10000, erg_eval
         alpha (float, optional)     : Learning rate
         num_iters (int, optional)   : Number of iterations to run gradient descent
         erg_eval (float, optional)  : Minimum error improvement
+        reg (None or float)         : Regularize complexity of a function for weights
 
     Returns:
         w (ndarray)       : Updated values of parameters
@@ -90,10 +98,10 @@ def gradient_descent_log(X, y, w_in, b_in, alpha=0.01, num_iters=10000, erg_eval
         dj_dw, dj_db = compute_gradient_log(X_train, y_train, w, b)
         
         # Updates hyperparameters
-        w = w - a * dj_dw
+        w = w - a * dj_dw - a * (reg * w / X.shape[0]) # Regularization coeff 
         b = b - a * dj_db
-    
-        new_error = compute_cost_log(X_train, y_train, w, b)
+        
+        new_error = compute_cost_log(X_train, y_train, w, b, reg)
         
         # Save cost J at each iteration
         if i % 10 == 0: # prevent resource exhaustion 
@@ -120,12 +128,15 @@ if __name__ == '__main__':
     X_train = np.array([[0.5, 1.5], [1,1], [1.5, 0.5], [3, 0.5], [2, 2], [1, 2.5]])
     y_train = np.array([0, 0, 0, 1, 1, 1])
     
-    # Parameters
-    a = 0.1
+    # Hyperparameters
+    a = 1.2
     w = np.zeros_like(X_train[0])
     b = 0
+    regularization = 0
     
-    w, b, history = gradient_descent_log(X_train, y_train, w, b, a, iters, erg_eval)
+    w, b, history = gradient_descent_log(
+        X_train, y_train, w, b, a, iters, erg_eval, regularization
+    )
     
     # Predict
     print(f"Cost: {compute_cost_log(X_train, y_train, w, b):.3f}")
@@ -168,7 +179,6 @@ if __name__ == '__main__':
     
     # Boundary line
     ax2.plot([0,x0], [x1,0], c='green', lw=3)
-    ax2.fill_between()
     
     plt.show()
     

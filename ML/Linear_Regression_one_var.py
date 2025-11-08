@@ -12,7 +12,7 @@ def compute_model_output(x, w, b):
     return f_wb
 
 
-def compute_cost(x, y, w, b):
+def compute_cost(x, y, w, b, reg=0):
 
     # number of training examples
     m = x.shape[0]
@@ -22,12 +22,14 @@ def compute_cost(x, y, w, b):
         f_wb = w * x[i] + b
         cost = (f_wb - y[i]) ** 2
         cost_sum += cost
-    total_cost = (1 / (2 * m)) * cost_sum
+        
+    # Total cost regularized at the end (one variable/feature)
+    total_cost = (1 / (2 * m)) * cost_sum + (reg * w) / (2 * m)
 
     return total_cost
 
 
-def compute_parameters(x, y, w, b, a=0.001):
+def compute_parameters(x, y, w, b, a=0.001, reg=0):
     m = x.shape[0]
     def der_sum_weight():
         total = 0
@@ -41,7 +43,8 @@ def compute_parameters(x, y, w, b, a=0.001):
             total += w * x[i] + b - y[i]
         return total / m
     
-    new_w = w - a * der_sum_weight()
+    # Added regularization at the end
+    new_w = w - a * der_sum_weight() - a * (reg * w) / m
     new_b = b - a * der_sum_bias()
     
     return (new_w, new_b)
@@ -61,12 +64,14 @@ if __name__ == "__main__":
     # Starting point
     w = 0
     b = 0
+    alpha = 1e-5
     error = math.inf
+    regularization = 0
     
     # Finding weight and bias
     for i in range(MAX_ITERATIONS):
-        w, b = compute_parameters(x, y, w, b, a=0.00001)
-        new_error = compute_cost(x, y, w, b)
+        w, b = compute_parameters(x, y, w, b, alpha, regularization)
+        new_error = compute_cost(x, y, w, b, regularization)
         
         if error - new_error < MIN_ERROR_IMPROVEMENT or new_error > error:
             print(f"Converged after {i+1} iterations.")
