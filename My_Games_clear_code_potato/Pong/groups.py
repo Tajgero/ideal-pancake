@@ -5,6 +5,7 @@ class AllSprites(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
         self.display_surface = pygame.display.get_surface()
+        self.font = pygame.font.Font(None, 60)
                 
     def draw(self):
         # Wyświetla shadow - surface, pozycja + offset

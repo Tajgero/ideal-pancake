@@ -116,7 +116,7 @@ def shortest_path(source: str, target: str) -> list[tuple]:
         # 3. Else expand node from this node and add to frontier and explored states
         
         # Mark node as explored
-        explored_set.add(node.state) 
+        explored_set.add(node.state)
         
         # Add neighbors to frontier
         for action, state in neighbors_for_person(node.state):

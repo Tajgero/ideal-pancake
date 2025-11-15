@@ -38,7 +38,7 @@ class Game:
         self.timers = {'player_end': Timer(1000, func=self.opponent_turn),
                        'opponent_end': Timer(1000, func=self.player_turn)}
         
-    def get_input(self, state, data = None):
+    def get_input(self, state, data=None):
         if state == 'attack':
             self.apply_attack(self.opponent, attack=data)
         elif state == 'heal':
